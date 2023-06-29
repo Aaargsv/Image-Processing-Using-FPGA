@@ -1,0 +1,130 @@
+module VGA
+	#(
+		parameter WIDTH_IMAGE  = 640,
+		parameter HEIGHT_IMAGE = 480
+	)
+	(
+		input  logic 		  i_clk,
+		input  logic [15:0]   i_data,
+		input  logic 		  i_reset_n,
+
+		input  logic 		  i_red_screen,
+
+		output logic [18:0]	  o_pixel_counter,
+		output logic 		  o_hsync,
+		output logic 		  o_vsync,
+		output logic [7:0]    o_R,
+		output logic [7:0]    o_G,
+		output logic [7:0]    o_B,
+
+		output logic 		  o_clk,
+		output logic 		  o_nsync,
+		output logic 		  o_nblank
+	);
+
+	/*Horizontal timing (line)*/
+	localparam horz_visible_area = 640;
+	localparam horz_front_porch  = 16;
+	localparam horz_sync_pulse   = 96;
+	localparam horz_back_porch   = 48;
+	localparam horz_whole_line   = 800;
+	
+	/*Vertical timing (frame)*/
+	localparam vert_visible_area = 480;
+	localparam vert_front_porch  = 10;
+	localparam vert_sync_pulse   = 2;
+	localparam vert_back_porch   = 33;
+	localparam vert_whole_line   = 525;
+
+	localparam NUM_PIXELS = WIDTH_IMAGE * HEIGHT_IMAGE - 1;
+	
+	logic [9:0]  r_horz_counter;
+	logic [9:0]  r_vert_counter;
+	logic [18:0] r_pixel_counter;
+	
+	logic s_in_visible_area;
+	
+	always_ff @(posedge  i_clk, negedge i_reset_n)
+		begin
+			if (~i_reset_n)
+				begin
+					r_horz_counter <= '0;
+					r_vert_counter <= '0;
+				end
+			else
+				begin
+					if (r_horz_counter < horz_whole_line - 1)
+						r_horz_counter <= r_horz_counter + 1'b1;
+					else
+						begin
+							r_horz_counter <= '0;
+							if (r_vert_counter < vert_whole_line - 1)
+								r_vert_counter <= r_vert_counter + 1'b1;
+							else
+								r_vert_counter <= '0;
+						end
+				end
+		end
+	
+
+	assign o_pixel_counter = r_pixel_counter;
+	
+	assign o_hsync = (r_horz_counter < horz_visible_area + horz_front_porch) || 
+						(r_horz_counter > horz_visible_area + horz_front_porch + horz_sync_pulse);
+						 
+	assign o_vsync = (r_vert_counter < vert_visible_area + vert_front_porch) || 
+						(r_vert_counter > vert_visible_area + vert_front_porch + vert_sync_pulse);
+	
+	assign s_in_visible_area = (r_horz_counter < horz_visible_area) && (r_vert_counter < vert_visible_area);// && conf_done;
+	
+	always_ff @(posedge clk, negedge i_reset_n) 
+		begin
+			if (~i_reset_n) 
+				begin
+					o_R <= 0;
+					o_G <= 0;
+					o_B <= 0;
+					r_pixel_counter <= 0;
+				end
+			else
+				begin
+					if (s_in_visible_area) 
+						begin
+							if (r_pixel_counter < NUM_PIXELS)
+								r_pixel_counter <= r_pixel_counter + 1'b1;
+							else
+								r_pixel_counter <= '0;
+		
+							if(~i_red_screen) 
+								begin
+									o_R <= 255;
+									o_G <= 0;
+									o_B <= 0;
+								end
+							else 
+								begin
+									o_R <= { i_data[15 : 11], i_data[15 : 13]};
+									o_G <= { i_data[10 : 5],  i_data[10 : 9]};
+									o_B <= { i_data[4  : 0],  i_data[4  : 2]};
+								end
+						end
+					else
+						begin
+							o_R <= 0;
+							o_G <= 0;
+							o_B <= 0;
+						end
+				end
+		end
+	assign o_nsync   = 1'b1;
+	assign o_nblank  = ((r_horz_counter < horz_visible_area) && (r_vert_counter < vert_visible_area)) ? 1'b1 : 1'b0;
+	assign o_clk   = i_clk;
+
+endmodule : VGA
+			
+			
+			
+	
+	
+						 
+	

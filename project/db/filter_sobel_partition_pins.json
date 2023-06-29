@@ -1,0 +1,189 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "o_device_working",
+					"strict" : false
+				},
+				{
+					"name" : "o_xclk",
+					"strict" : false
+				},
+				{
+					"name" : "o_siod",
+					"strict" : false
+				},
+				{
+					"name" : "o_sioc",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][0]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][1]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][2]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][3]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][4]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][5]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][6]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[0][7]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][0]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][1]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][2]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][3]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][4]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][5]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][6]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[1][7]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][0]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][1]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][2]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][3]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][4]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][5]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][6]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data[2][7]",
+					"strict" : false
+				},
+				{
+					"name" : "o_data_ready",
+					"strict" : false
+				},
+				{
+					"name" : "i_reset_n",
+					"strict" : false
+				},
+				{
+					"name" : "i_clk",
+					"strict" : false
+				},
+				{
+					"name" : "i_select_mode",
+					"strict" : false
+				},
+				{
+					"name" : "i_threshold",
+					"strict" : false
+				},
+				{
+					"name" : "i_change_kernel",
+					"strict" : false
+				},
+				{
+					"name" : "i_hsync",
+					"strict" : false
+				},
+				{
+					"name" : "i_pclk",
+					"strict" : false
+				},
+				{
+					"name" : "i_vsync",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[2]",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[3]",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[4]",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[0]",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[1]",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[5]",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[6]",
+					"strict" : false
+				},
+				{
+					"name" : "i_data[7]",
+					"strict" : false
+				}
+			]
+		}
+	]
+}
