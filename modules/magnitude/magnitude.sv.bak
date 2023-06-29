@@ -1,0 +1,148 @@
+module magnitude
+    #(
+        parameter COLOR_CHANNEL
+    )
+    (
+        input   logic                                 i_clk,
+        input   logic                                 i_reset_n,
+        input   logic                                 i_data_ready,
+        input   logic [COLOR_CHANNEL - 1 : 0]		  i_convolution_value		   [1 : 0][2 : 0],
+
+        output  logic                                 o_data_ready,
+        output  logic [2 : 0][COLOR_CHANNEL - 1 : 0]  o_magnitude_value            [2 : 0],
+
+    );
+
+    logic [COLOR_CHANNEL - 1 : 0]		  r_convolution_value		   [1 : 0][2 : 0];
+    logic s_data_ready;
+
+    logic [2 * COLOR_CHANNEL : 0]         r_sum_of_squares             [2 : 0];
+
+    logic [8 : 0] 		                  w_sqrt                       [2 : 0]; //((2 * COLOR_CHANNEL + 1)) + 1) / 2 - 1
+    logic                                 w_sqrt_ready                 [2 : 0];
+    logic [2 : 0]                         w_range_contorl_ready;
+
+
+    assign r_sum_of_squares[0] =  r_convolution_value[0][0] * r_convolution_value[0][0]
+                                + r_convolution_value[1][0] * r_convolution_value[1][0];
+
+    assign r_sum_of_squares[1] =  r_convolution_value[0][1] * r_convolution_value[0][1]
+                                + r_convolution_value[1][1] * r_convolution_value[1][1];
+
+    assign r_sum_of_squares[2] =  r_convolution_value[0][2] * r_convolution_value[0][2]
+                                + r_convolution_value[1][2] * r_convolution_value[1][2];
+
+    assign o_data_ready = &w_range_contorl_ready;
+
+    sqrt
+    #(
+        .DATA_SIZE      (2 * COLOR_CHANNEL + 1),
+        .COLOR_CHANNEL  (COLOR_CHANNEL)
+    ) sqrt_inst_0
+    (
+        .i_clk          (i_clk),
+        .i_reset_n      (i_reset_n),
+        .i_data         ({1'b0, r_sum_of_squaresp[0]}),
+        .i_data_ready   (s_data_ready),
+
+        .o_data         (w_sqrt[0]),
+        .o_data_ready   (w_sqrt_ready[0])
+    );
+
+    sqrt
+    #(
+        .DATA_SIZE      (2 * COLOR_CHANNEL + 1),
+        .COLOR_CHANNEL  (COLOR_CHANNEL)
+    ) sqrt_inst_1
+      (
+          .i_clk          (i_clk),
+          .i_reset_n      (i_reset_n),
+          .i_data         ({1'b0, r_sum_of_squaresp[1]}),
+          .i_data_ready   (s_data_ready),
+
+          .o_data         (w_sqrt[1]),
+          .o_data_ready   (w_sqrt_ready[1])
+      );
+
+    sqrt
+    #(
+        .DATA_SIZE      (2 * COLOR_CHANNEL + 1),
+        .COLOR_CHANNEL  (COLOR_CHANNEL)
+    ) sqrt_inst_2
+      (
+          .i_clk          (i_clk),
+          .i_reset_n      (i_reset_n),
+          .i_data         ({1'b0, r_sum_of_squaresp[2]}),
+          .i_data_ready   (s_data_ready),
+
+          .o_data         (w_sqrt[2]),
+          .o_data_ready   (w_sqrt_ready[2])
+      );
+
+
+    range_control
+    #(
+        .COLOR_CHANNEL (COLOR_CHANNEL),
+        .DATA_SIZE     (2 * COLOR_CHANNEL + 1)
+    )
+    range_control_inst_0
+    (
+        .i_clk          (i_clk),
+        .i_reset_n      (i_reset_n),
+        .i_data_ready   (w_sqrt_ready[0]),
+        .i_data         (w_sqrt[0]),
+
+        .o_data_ready   (w_range_contorl_ready[0]),
+        .o_data         (o_magnitude_value[0])
+    );
+
+    range_control
+    #(
+        .COLOR_CHANNEL (COLOR_CHANNEL),
+        .DATA_SIZE     (2 * COLOR_CHANNEL + 1)
+    )
+    range_control_inst_1
+    (
+        .i_clk          (i_clk),
+        .i_reset_n      (i_reset_n),
+        .i_data_ready   (w_sqrt_ready[1]),
+        .i_data         (w_sqrt[1]),
+
+        .o_data_ready   (w_range_contorl_ready[1]),
+        .o_data         (o_magnitude_value[1])
+    );
+
+
+    range_control
+    #(
+        .COLOR_CHANNEL (COLOR_CHANNEL),
+        .DATA_SIZE     (2 * COLOR_CHANNEL + 1)
+    )
+        range_control_inst_2
+        (
+            .i_clk          (i_clk),
+            .i_reset_n      (i_reset_n),
+            .i_data_ready   (w_sqrt_ready[2]),
+            .i_data         (w_sqrt[2]),
+
+            .o_data_ready   (w_range_contorl_ready[2]),
+            .o_data         (o_magnitude_value[2])
+        );
+
+
+    always_ff @(posedge i_clk)
+        begin
+            if (!i_reset_n)
+                s_data_ready <= 0;
+            else
+                begin
+                    if (i_data_ready)
+                        begin
+                            s_data_ready            <= 1;
+                            r_convolution_value     <= i_convolution_value;
+                        end
+                    else
+                        s_data_ready            <= 0;
+                end
+        end
+endmodule : magnitude
